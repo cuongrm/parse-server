@@ -21,7 +21,6 @@
         "space-in-parens": ["error", "never"],
         "no-multiple-empty-lines": 1,
         "prefer-const": "error",
-        "space-infix-ops": "error",
-        "no-useless-escape": "off"
+        "space-infix-ops": "error"
     }
 }
