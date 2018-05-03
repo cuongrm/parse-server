@@ -1,13 +1,13 @@
-const request = require('request');
-const Config = require("../src/Config");
-const defaultColumns = require('../src/Controllers/SchemaController').defaultColumns;
-const authenticationLoader = require('../src/Adapters/Auth');
-const path = require('path');
+var request = require('request');
+var Config = require("../src/Config");
+var defaultColumns = require('../src/Controllers/SchemaController').defaultColumns;
+var authenticationLoader = require('../src/Adapters/Auth');
+var path = require('path');
 
-describe('AuthenticationProviders', function() {
-  ["facebook", "facebookaccountkit", "github", "instagram", "google", "linkedin", "meetup", "twitter", "janrainengage", "janraincapture", "vkontakte"].map(function(providerName){
+describe('AuthenticationProviers', function() {
+  ["facebook", "github", "instagram", "google", "linkedin", "meetup", "twitter", "janrainengage", "janraincapture", "vkontakte"].map(function(providerName){
     it("Should validate structure of " + providerName, (done) => {
-      const provider = require("../src/Adapters/Auth/" + providerName);
+      var provider = require("../src/Adapters/Auth/" + providerName);
       jequal(typeof provider.validateAuthData, "function");
       jequal(typeof provider.validateAppId, "function");
       const authDataPromise = provider.validateAuthData({}, {});
@@ -20,7 +20,7 @@ describe('AuthenticationProviders', function() {
     });
   });
 
-  const getMockMyOauthProvider = function() {
+  var getMockMyOauthProvider = function() {
     return {
       authData: {
         id: "12345",
@@ -70,47 +70,34 @@ describe('AuthenticationProviders', function() {
     }
   });
 
-  const createOAuthUser = function(callback) {
-    return createOAuthUserWithSessionToken(undefined, callback);
-  }
-
-  const createOAuthUserWithSessionToken = function(token, callback) {
-    const jsonBody = {
+  var createOAuthUser = function(callback) {
+    var jsonBody = {
       authData: {
         myoauth: getMockMyOauthProvider().authData
       }
     };
 
-    const options = {
+    var options = {
       headers: {'X-Parse-Application-Id': 'test',
         'X-Parse-REST-API-Key': 'rest',
         'X-Parse-Installation-Id': 'yolo',
-        'X-Parse-Session-Token': token,
         'Content-Type': 'application/json' },
       url: 'http://localhost:8378/1/users',
-      body: jsonBody,
-      json: true
+      body: JSON.stringify(jsonBody)
     };
 
-    return new Promise((resolve) => {
-      request.post(options, (err, res, body) => {
-        resolve({err, res, body});
-        if (callback) {
-          callback(err, res, body);
-        }
-      });
-    });
+    return request.post(options, callback);
   }
 
   it("should create user with REST API", done => {
     createOAuthUser((error, response, body) => {
       expect(error).toBe(null);
-      const b = body;
+      var b = JSON.parse(body);
       ok(b.sessionToken);
       expect(b.objectId).not.toBeNull();
       expect(b.objectId).not.toBeUndefined();
-      const sessionToken = b.sessionToken;
-      const q = new Parse.Query("_Session");
+      var sessionToken = b.sessionToken;
+      var q = new Parse.Query("_Session");
       q.equalTo('sessionToken', sessionToken);
       q.first({useMasterKey: true}).then((res) => {
         if (!res) {
@@ -128,17 +115,17 @@ describe('AuthenticationProviders', function() {
   });
 
   it("should only create a single user with REST API", (done) => {
-    let objectId;
+    var objectId;
     createOAuthUser((error, response, body) => {
       expect(error).toBe(null);
-      const b = body
+      var b = JSON.parse(body);
       expect(b.objectId).not.toBeNull();
       expect(b.objectId).not.toBeUndefined();
       objectId = b.objectId;
 
       createOAuthUser((error, response, body) => {
         expect(error).toBe(null);
-        const b = body;
+        var b = JSON.parse(body);
         expect(b.objectId).not.toBeNull();
         expect(b.objectId).not.toBeUndefined();
         expect(b.objectId).toBe(objectId);
@@ -147,24 +134,8 @@ describe('AuthenticationProviders', function() {
     });
   });
 
-  it("should fail to link if session token don't match user", (done) => {
-    Parse.User.signUp('myUser', 'password').then((user) => {
-      return createOAuthUserWithSessionToken(user.getSessionToken());
-    }).then(() => {
-      return Parse.User.logOut();
-    }).then(() => {
-      return Parse.User.signUp('myUser2', 'password');
-    }).then((user) => {
-      return createOAuthUserWithSessionToken(user.getSessionToken());
-    }).then(({ body }) => {
-      expect(body.code).toBe(208);
-      expect(body.error).toBe('this auth is already used');
-      done();
-    }).catch(done.fail);
-  });
-
   it("unlink and link with custom provider", (done) => {
-    const provider = getMockMyOauthProvider();
+    var provider = getMockMyOauthProvider();
     Parse.User._registerAuthenticationProvider(provider);
     Parse.User._logInWith("myoauth", {
       success: function(model) {
@@ -180,38 +151,38 @@ describe('AuthenticationProviders', function() {
           success: function(model) {
 
             ok(!model._isLinked("myoauth"),
-              "User should not be linked to myoauth");
+               "User should not be linked to myoauth");
             ok(!provider.synchronizedUserId, "User id should be cleared");
             ok(!provider.synchronizedAuthToken, "Auth token should be cleared");
             ok(!provider.synchronizedExpiration,
-              "Expiration should be cleared");
+               "Expiration should be cleared");
             // make sure the auth data is properly deleted
-            const config = Config.get(Parse.applicationId);
+            var config = new Config(Parse.applicationId);
             config.database.adapter.find('_User', {
               fields: Object.assign({}, defaultColumns._Default, defaultColumns._Installation),
             }, { objectId: model.id }, {})
-              .then(res => {
-                expect(res.length).toBe(1);
-                expect(res[0]._auth_data_myoauth).toBeUndefined();
-                expect(res[0]._auth_data_myoauth).not.toBeNull();
+            .then(res => {
+              expect(res.length).toBe(1);
+              expect(res[0]._auth_data_myoauth).toBeUndefined();
+              expect(res[0]._auth_data_myoauth).not.toBeNull();
 
-                model._linkWith("myoauth", {
-                  success: function(model) {
-                    ok(provider.synchronizedUserId, "User id should have a value");
-                    ok(provider.synchronizedAuthToken,
-                      "Auth token should have a value");
-                    ok(provider.synchronizedExpiration,
-                      "Expiration should have a value");
-                    ok(model._isLinked("myoauth"),
-                      "User should be linked to myoauth");
-                    done();
-                  },
-                  error: function() {
-                    ok(false, "linking again should succeed");
-                    done();
-                  }
-                });
+              model._linkWith("myoauth", {
+                success: function(model) {
+                  ok(provider.synchronizedUserId, "User id should have a value");
+                  ok(provider.synchronizedAuthToken,
+                     "Auth token should have a value");
+                  ok(provider.synchronizedExpiration,
+                     "Expiration should have a value");
+                  ok(model._isLinked("myoauth"),
+                     "User should be linked to myoauth");
+                  done();
+                },
+                error: function() {
+                  ok(false, "linking again should succeed");
+                  done();
+                }
               });
+            });
           },
           error: function() {
             ok(false, "unlinking should succeed");
@@ -230,10 +201,10 @@ describe('AuthenticationProviders', function() {
     expect(typeof validator).toBe('function');
   }
 
-  function validateAuthenticationHandler(authenticationHandler) {
-    expect(authenticationHandler).not.toBeUndefined();
-    expect(typeof authenticationHandler.getValidatorForProvider).toBe('function');
-    expect(typeof authenticationHandler.getValidatorForProvider).toBe('function');
+  function validateAuthenticationHandler(authenticatonHandler) {
+    expect(authenticatonHandler).not.toBeUndefined();
+    expect(typeof authenticatonHandler.getValidatorForProvider).toBe('function');
+    expect(typeof authenticatonHandler.getValidatorForProvider).toBe('function');
   }
 
   function validateAuthenticationAdapter(authAdapter) {
@@ -244,7 +215,7 @@ describe('AuthenticationProviders', function() {
   }
 
   it('properly loads custom adapter', (done) => {
-    const validAuthData = {
+    var validAuthData = {
       id: 'hello',
       token: 'world'
     }
@@ -344,71 +315,5 @@ describe('AuthenticationProviders', function() {
     validateAuthenticationAdapter(adapter);
     expect(appIds).toEqual(['a', 'b']);
     expect(providerOptions).toEqual(options.custom);
-  });
-
-  it('properly loads Facebook accountkit adapter with options', () => {
-    const options = {
-      facebookaccountkit: {
-        appIds: ['a', 'b'],
-        appSecret: 'secret'
-      }
-    };
-    const {adapter, appIds, providerOptions} = authenticationLoader.loadAuthAdapter('facebookaccountkit', options);
-    validateAuthenticationAdapter(adapter);
-    expect(appIds).toEqual(['a', 'b']);
-    expect(providerOptions.appSecret).toEqual('secret');
-  });
-
-  it('should fail if Facebook appIds is not configured properly', (done) => {
-    const options = {
-      facebookaccountkit: {
-        appIds: []
-      }
-    };
-    const {adapter, appIds} = authenticationLoader.loadAuthAdapter('facebookaccountkit', options);
-    adapter.validateAppId(appIds)
-      .then(done.fail, err => {
-        expect(err.code).toBe(Parse.Error.OBJECT_NOT_FOUND);
-        done();
-      })
-  });
-
-  it('should fail to validate Facebook accountkit auth with bad token', (done) => {
-    const options = {
-      facebookaccountkit: {
-        appIds: ['a', 'b']
-      }
-    };
-    const authData = {
-      id: 'fakeid',
-      access_token: 'badtoken'
-    };
-    const {adapter} = authenticationLoader.loadAuthAdapter('facebookaccountkit', options);
-    adapter.validateAuthData(authData)
-      .then(done.fail, err => {
-        expect(err.code).toBe(190);
-        expect(err.type).toBe('OAuthException');
-        done();
-      })
-  });
-
-  it('should fail to validate Facebook accountkit auth with bad token regardless of app secret proof', (done) => {
-    const options = {
-      facebookaccountkit: {
-        appIds: ['a', 'b'],
-        appSecret: 'badsecret'
-      }
-    };
-    const authData = {
-      id: 'fakeid',
-      access_token: 'badtoken'
-    };
-    const {adapter, providerOptions} = authenticationLoader.loadAuthAdapter('facebookaccountkit', options);
-    adapter.validateAuthData(authData, providerOptions)
-      .then(done.fail, err => {
-        expect(err.code).toBe(190);
-        expect(err.type).toBe('OAuthException');
-        done();
-      })
   });
 });

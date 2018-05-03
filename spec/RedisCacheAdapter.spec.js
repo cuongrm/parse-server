@@ -1,4 +1,4 @@
-const RedisCacheAdapter = require('../src/Adapters/Cache/RedisCacheAdapter').default;
+var RedisCacheAdapter = require('../src/Adapters/Cache/RedisCacheAdapter').default;
 /*
 To run this test part of the complete suite
 set PARSE_SERVER_TEST_CACHE='redis'
@@ -7,8 +7,8 @@ and make sure a redis server is available on the default port
 describe_only(() => {
   return process.env.PARSE_SERVER_TEST_CACHE === 'redis';
 })('RedisCacheAdapter', function() {
-  const KEY = 'hello';
-  const VALUE = 'world';
+  var KEY = 'hello';
+  var VALUE = 'world';
 
   function wait(sleep) {
     return new Promise(function(resolve) {
@@ -17,7 +17,7 @@ describe_only(() => {
   }
 
   it('should get/set/clear', (done) => {
-    const cache = new RedisCacheAdapter({
+    var cache = new RedisCacheAdapter({
       ttl: NaN
     });
 
@@ -31,7 +31,7 @@ describe_only(() => {
   });
 
   it('should expire after ttl', (done) => {
-    const cache = new RedisCacheAdapter(null, 1);
+    var cache = new RedisCacheAdapter(null, 1);
 
     cache.put(KEY, VALUE)
       .then(() => cache.get(KEY))
@@ -43,7 +43,7 @@ describe_only(() => {
   });
 
   it('should find un-expired records', (done) => {
-    const cache = new RedisCacheAdapter(null, 5);
+    var cache = new RedisCacheAdapter(null, 5);
 
     cache.put(KEY, VALUE)
       .then(() => cache.get(KEY))

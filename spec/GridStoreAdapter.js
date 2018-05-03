@@ -1,24 +1,24 @@
-const MongoClient = require("mongodb").MongoClient;
-const GridStore = require("mongodb").GridStore;
+var MongoClient = require("mongodb").MongoClient;
+var GridStore = require("mongodb").GridStore;
 
-const GridStoreAdapter = require("../src/Adapters/Files/GridStoreAdapter").GridStoreAdapter;
-const Config = require("../src/Config");
-const FilesController = require('../src/Controllers/FilesController').default;
+var GridStoreAdapter = require("../src/Adapters/Files/GridStoreAdapter").GridStoreAdapter;
+var Config = require("../src/Config");
+var FilesController = require('../src/Controllers/FilesController').default;
 
 
 // Small additional tests to improve overall coverage
 describe_only_db('mongo')("GridStoreAdapter",() =>{
   it("should properly instanciate the GridStore when deleting a file", (done) => {
 
-    const databaseURI = 'mongodb://localhost:27017/parse';
-    const config = Config.get(Parse.applicationId);
-    const gridStoreAdapter = new GridStoreAdapter(databaseURI);
-    const filesController = new FilesController(gridStoreAdapter);
+    var databaseURI = 'mongodb://localhost:27017/parse';
+    var config = new Config(Parse.applicationId);
+    var gridStoreAdapter = new GridStoreAdapter(databaseURI);
+    var filesController = new FilesController(gridStoreAdapter);
 
     // save original unlink before redefinition
-    const originalUnlink = GridStore.prototype.unlink;
+    var originalUnlink = GridStore.prototype.unlink;
 
-    let gridStoreMode;
+    var gridStoreMode;
 
     // new unlink method that will capture the mode in which GridStore was opened
     GridStore.prototype.unlink = function() {

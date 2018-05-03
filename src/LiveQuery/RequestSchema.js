@@ -7,7 +7,6 @@ const general = {
       'enum': ['connect', 'subscribe', 'unsubscribe', 'update']
     },
   },
-  'required': ['op']
 };
 
 const connect =  {

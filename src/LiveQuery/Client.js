@@ -8,7 +8,6 @@ const dafaultFields = ['className', 'objectId', 'updatedAt', 'createdAt', 'ACL']
 class Client {
   id: number;
   parseWebSocket: any;
-  hasMasterKey: boolean;
   userId: string;
   roles: Array<string>;
   subscriptionInfos: Object;
@@ -21,10 +20,9 @@ class Client {
   pushDelete: Function;
   pushLeave: Function;
 
-  constructor(id: number, parseWebSocket: any, hasMasterKey: boolean) {
+  constructor(id: number, parseWebSocket: any) {
     this.id = id;
     this.parseWebSocket = parseWebSocket;
-    this.hasMasterKey = hasMasterKey;
     this.roles = [];
     this.subscriptionInfos = new Map();
     this.pushConnect = this._pushEvent('connected');

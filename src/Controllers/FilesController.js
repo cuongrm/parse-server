@@ -19,10 +19,10 @@ export class FilesController extends AdaptableController {
 
     const hasExtension = extname.length > 0;
 
-    if (!hasExtension && contentType && mime.getExtension(contentType)) {
-      filename = filename + '.' + mime.getExtension(contentType);
+    if (!hasExtension && contentType && mime.extension(contentType)) {
+      filename = filename + '.' + mime.extension(contentType);
     } else if (hasExtension && !contentType) {
-      contentType = mime.getType(filename);
+      contentType = mime.lookup(filename);
     }
 
     filename = randomHexString(32) + '_' + filename;

@@ -17,19 +17,19 @@ const mockAdapter = {
 describe("FilesController",() =>{
   it("should properly expand objects", (done) => {
 
-    const config = Config.get(Parse.applicationId);
-    const gridStoreAdapter = new GridStoreAdapter('mongodb://localhost:27017/parse');
-    const filesController = new FilesController(gridStoreAdapter)
-    const result = filesController.expandFilesInObject(config, function(){});
+    var config = new Config(Parse.applicationId);
+    var gridStoreAdapter = new GridStoreAdapter('mongodb://localhost:27017/parse');
+    var filesController = new FilesController(gridStoreAdapter)
+    var result = filesController.expandFilesInObject(config, function(){});
 
     expect(result).toBeUndefined();
 
-    const fullFile = {
+    var fullFile = {
       type: '__type',
       url: "http://an.url"
     }
 
-    const anObject = {
+    var anObject = {
       aFile: fullFile
     }
     filesController.expandFilesInObject(config, anObject);

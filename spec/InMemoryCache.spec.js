@@ -2,16 +2,16 @@ const InMemoryCache = require('../src/Adapters/Cache/InMemoryCache').default;
 
 
 describe('InMemoryCache', function() {
-  const BASE_TTL = {
-    ttl: 100
+  var BASE_TTL = {
+    ttl: 10
   };
-  const NO_EXPIRE_TTL = {
+  var NO_EXPIRE_TTL = {
     ttl: NaN
   };
-  const KEY = 'hello';
-  const KEY_2 = KEY + '_2';
+  var KEY = 'hello';
+  var KEY_2 = KEY + '_2';
 
-  const VALUE = 'world';
+  var VALUE = 'world';
 
 
   function wait(sleep) {
@@ -21,14 +21,14 @@ describe('InMemoryCache', function() {
   }
 
   it('should destroy a expire items in the cache', (done) => {
-    const cache = new InMemoryCache(BASE_TTL);
+    var cache = new InMemoryCache(BASE_TTL);
 
     cache.put(KEY, VALUE);
 
-    let value = cache.get(KEY);
+    var value = cache.get(KEY);
     expect(value).toEqual(VALUE);
 
-    wait(BASE_TTL.ttl * 2).then(() => {
+    wait(BASE_TTL.ttl * 5).then(() => {
       value = cache.get(KEY)
       expect(value).toEqual(null);
       done();
@@ -36,7 +36,7 @@ describe('InMemoryCache', function() {
   });
 
   it('should delete items', (done) => {
-    const cache = new InMemoryCache(NO_EXPIRE_TTL);
+    var cache = new InMemoryCache(NO_EXPIRE_TTL);
     cache.put(KEY, VALUE);
     cache.put(KEY_2, VALUE);
     expect(cache.get(KEY)).toEqual(VALUE);
@@ -53,7 +53,7 @@ describe('InMemoryCache', function() {
   });
 
   it('should clear all items', (done) => {
-    const cache = new InMemoryCache(NO_EXPIRE_TTL);
+    var cache = new InMemoryCache(NO_EXPIRE_TTL);
     cache.put(KEY, VALUE);
     cache.put(KEY_2, VALUE);
 
@@ -67,7 +67,7 @@ describe('InMemoryCache', function() {
   });
 
   it('should deafult TTL to 5 seconds', () => {
-    const cache = new InMemoryCache({});
+    var cache = new InMemoryCache({});
     expect(cache.ttl).toEqual(5 * 1000);
   });
 

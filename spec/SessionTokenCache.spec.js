@@ -1,9 +1,9 @@
-const SessionTokenCache = require('../src/LiveQuery/SessionTokenCache').SessionTokenCache;
+var SessionTokenCache = require('../src/LiveQuery/SessionTokenCache').SessionTokenCache;
 
 describe('SessionTokenCache', function() {
 
   beforeEach(function(done) {
-    const Parse = require('parse/node');
+    var Parse = require('parse/node');
 
     spyOn(Parse, "Query").and.returnValue({
       first: jasmine.createSpy("first").and.returnValue(Parse.Promise.as(new Parse.Object("_Session", {
@@ -16,7 +16,7 @@ describe('SessionTokenCache', function() {
   });
 
   it('can get undefined userId', function(done) {
-    const sessionTokenCache = new SessionTokenCache();
+    var sessionTokenCache = new SessionTokenCache();
 
     sessionTokenCache.getUserId(undefined).then(() => {
     }, (error) => {
@@ -26,9 +26,9 @@ describe('SessionTokenCache', function() {
   });
 
   it('can get existing userId', function(done) {
-    const sessionTokenCache = new SessionTokenCache();
-    const sessionToken = 'sessionToken';
-    const userId = 'userId'
+    var sessionTokenCache = new SessionTokenCache();
+    var sessionToken = 'sessionToken';
+    var userId = 'userId'
     sessionTokenCache.cache.set(sessionToken, userId);
 
     sessionTokenCache.getUserId(sessionToken).then((userIdFromCache) => {
@@ -38,7 +38,7 @@ describe('SessionTokenCache', function() {
   });
 
   it('can get new userId', function(done) {
-    const sessionTokenCache = new SessionTokenCache();
+    var sessionTokenCache = new SessionTokenCache();
 
     sessionTokenCache.getUserId('sessionToken').then((userIdFromCache) => {
       expect(userIdFromCache).toBe('userId');

@@ -16,7 +16,7 @@ describe('AnalyticsController', () => {
       })
     }).then(() => {
       expect(analyticsAdapter.trackEvent).toHaveBeenCalled();
-      const lastCall = analyticsAdapter.trackEvent.calls.first();
+      var lastCall = analyticsAdapter.trackEvent.calls.first();
       const args = lastCall.args;
       expect(args[0]).toEqual('MyEvent');
       expect(args[1]).toEqual({
@@ -44,7 +44,7 @@ describe('AnalyticsController', () => {
       })
     }).then(() => {
       expect(analyticsAdapter.appOpened).toHaveBeenCalled();
-      const lastCall = analyticsAdapter.appOpened.calls.first();
+      var lastCall = analyticsAdapter.appOpened.calls.first();
       const args = lastCall.args;
       expect(args[0]).toEqual({
         dimensions: {

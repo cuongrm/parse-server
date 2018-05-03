@@ -135,7 +135,10 @@ describe('ParseServerRESTController', () => {
     }).then(sessions => {
       expect(sessions.length).toBe(0);
       done();
-    }, done.fail);
+    }, (err) => {
+      jfail(err);
+      done();
+    });
   });
 
   it('ensures a session token is created when passing installationId != cloud', (done) => {

@@ -1,16 +1,14 @@
-const cryptoUtils = require('./cryptoUtils');
-const RestQuery = require('./RestQuery');
-const Parse = require('parse/node');
+var Parse = require('parse/node').Parse;
+var RestQuery = require('./RestQuery');
 
 // An Auth object tells you who is requesting something and whether
 // the master key was used.
 // userObject is a Parse.User and can be null if there's no user.
-function Auth({ config, isMaster = false, isReadOnly = false, user, installationId } = {}) {
+function Auth({ config, isMaster = false, user, installationId } = {}) {
   this.config = config;
   this.installationId = installationId;
   this.isMaster = isMaster;
   this.user = user;
-  this.isReadOnly = isReadOnly;
 
   // Assuming a users roles won't change during a single request, we'll
   // only load them once.
@@ -34,11 +32,6 @@ Auth.prototype.couldUpdateUserId = function(userId) {
 // A helper to get a master-level Auth object
 function master(config) {
   return new Auth({ config, isMaster: true });
-}
-
-// A helper to get a master-level Auth object
-function readOnly(config) {
-  return new Auth({ config, isMaster: true, isReadOnly: true });
 }
 
 // A helper to get a nobody-level Auth object
@@ -142,7 +135,7 @@ Auth.prototype._loadRoles = function() {
         this.fetchedRoles = true;
         this.rolePromise = null;
 
-        cacheAdapter.role.put(this.user.id, Array(...this.userRoles));
+        cacheAdapter.role.put(this.user.id, this.userRoles);
         return Promise.resolve(this.userRoles);
       }
       var rolesMap = results.reduce((m, r) => {
@@ -159,7 +152,8 @@ Auth.prototype._loadRoles = function() {
           });
           this.fetchedRoles = true;
           this.rolePromise = null;
-          cacheAdapter.role.put(this.user.id, Array(...this.userRoles));
+
+          cacheAdapter.role.put(this.user.id, this.userRoles);
           return Promise.resolve(this.userRoles);
         });
     });
@@ -213,46 +207,10 @@ Auth.prototype._getAllRolesNamesForRoleIds = function(roleIDs, names = [], queri
   })
 }
 
-const createSession = function(config, {
-  userId,
-  createdWith,
-  installationId,
-  additionalSessionData,
-}) {
-  const token = 'r:' + cryptoUtils.newToken();
-  const expiresAt = config.generateSessionExpiresAt();
-  const sessionData = {
-    sessionToken: token,
-    user: {
-      __type: 'Pointer',
-      className: '_User',
-      objectId: userId
-    },
-    createdWith,
-    restricted: false,
-    expiresAt: Parse._encode(expiresAt)
-  };
-
-  if (installationId) {
-    sessionData.installationId = installationId
-  }
-
-  Object.assign(sessionData, additionalSessionData);
-  // We need to import RestWrite at this point for the cyclic dependency it has to it
-  const RestWrite = require('./RestWrite');
-
-  return {
-    sessionData,
-    createSession: () => new RestWrite(config, master(config), '_Session', null, sessionData).execute()
-  }
-}
-
 module.exports = {
-  Auth,
-  master,
-  nobody,
-  readOnly,
+  Auth: Auth,
+  master: master,
+  nobody: nobody,
   getAuthForSessionToken,
-  getAuthForLegacySessionToken,
-  createSession,
+  getAuthForLegacySessionToken
 };

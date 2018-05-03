@@ -1,16 +1,16 @@
-const PushRouter = require('../src/Routers/PushRouter').PushRouter;
-const request = require('request');
+var PushRouter = require('../src/Routers/PushRouter').PushRouter;
+var request = require('request');
 
 describe('PushRouter', () => {
   it('can get query condition when channels is set', (done) => {
     // Make mock request
-    const request = {
+    var request = {
       body: {
         channels: ['Giants', 'Mets']
       }
     }
 
-    const where = PushRouter.getQueryCondition(request);
+    var where = PushRouter.getQueryCondition(request);
     expect(where).toEqual({
       'channels': {
         '$in': ['Giants', 'Mets']
@@ -21,7 +21,7 @@ describe('PushRouter', () => {
 
   it('can get query condition when where is set', (done) => {
     // Make mock request
-    const request = {
+    var request = {
       body: {
         'where': {
           'injuryReports': true
@@ -29,7 +29,7 @@ describe('PushRouter', () => {
       }
     }
 
-    const where = PushRouter.getQueryCondition(request);
+    var where = PushRouter.getQueryCondition(request);
     expect(where).toEqual({
       'injuryReports': true
     });
@@ -38,7 +38,7 @@ describe('PushRouter', () => {
 
   it('can get query condition when nothing is set', (done) => {
     // Make mock request
-    const request = {
+    var request = {
       body: {
       }
     }
@@ -51,7 +51,7 @@ describe('PushRouter', () => {
 
   it('can throw on getQueryCondition when channels and where are set', (done) => {
     // Make mock request
-    const request = {
+    var request = {
       body: {
         'channels': {
           '$in': ['Giants', 'Mets']

@@ -35,8 +35,9 @@ export function randomString(size: number): string {
 }
 
 // Returns a new random alphanumeric string suitable for object ID.
-export function newObjectId(size: number = 10): string {
-  return randomString(size);
+export function newObjectId(): string {
+  //TODO: increase length to better protect against collisions.
+  return randomString(10);
 }
 
 // Returns a new random hex string suitable for secure tokens.

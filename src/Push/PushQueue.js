@@ -1,7 +1,7 @@
-import { ParseMessageQueue }      from '../ParseMessageQueue';
-import rest                       from '../rest';
-import { applyDeviceTokenExists } from './utils';
-import Parse from 'parse/node';
+import { ParseMessageQueue }  from '../ParseMessageQueue';
+import rest                   from '../rest';
+import { isPushIncrementing } from './utils';
+import deepcopy               from 'deepcopy';
 
 const PUSH_CHANNEL = 'parse-server-push';
 const DEFAULT_BATCH_SIZE = 100;
@@ -14,33 +14,35 @@ export class PushQueue {
   // config object of the publisher, right now it only contains the redisURL,
   // but we may extend it later.
   constructor(config: any = {}) {
-    this.channel = config.channel || PushQueue.defaultPushChannel();
+    this.channel = config.channel || PUSH_CHANNEL;
     this.batchSize = config.batchSize || DEFAULT_BATCH_SIZE;
     this.parsePublisher = ParseMessageQueue.createPublisher(config);
   }
 
   static defaultPushChannel() {
-    return `${Parse.applicationId}-${PUSH_CHANNEL}`;
+    return PUSH_CHANNEL;
   }
 
   enqueue(body, where, config, auth, pushStatus) {
     const limit = this.batchSize;
-
-    where = applyDeviceTokenExists(where);
-
-    // Order by objectId so no impact on the DB
-    const order = 'objectId';
+    // Order by badge (because the payload is badge dependant)
+    // and createdAt to fix the order
+    const order = isPushIncrementing(body) ? 'badge,createdAt' : 'createdAt';
+    where = deepcopy(where);
+    if (!where.hasOwnProperty('deviceToken')) {
+      where['deviceToken'] = {'$exists': true};
+    }
     return Promise.resolve().then(() => {
       return rest.find(config,
-        auth,
-        '_Installation',
-        where,
-        {limit: 0, count: true});
+                       auth,
+                       '_Installation',
+                       where,
+                       {limit: 0, count: true});
     }).then(({results, count}) => {
-      if (!results || count == 0) {
-        return pushStatus.complete();
+      if (!results) {
+        return Promise.reject({error: 'PushController: no results in query'})
       }
-      pushStatus.setRunning(Math.ceil(count / limit));
+      pushStatus.setRunning(count);
       let skip = 0;
       while (skip < count) {
         const query = { where,

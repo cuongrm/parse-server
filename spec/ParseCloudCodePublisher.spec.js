@@ -1,10 +1,10 @@
-const ParseCloudCodePublisher = require('../src/LiveQuery/ParseCloudCodePublisher').ParseCloudCodePublisher;
-const Parse = require('parse/node');
+var ParseCloudCodePublisher = require('../src/LiveQuery/ParseCloudCodePublisher').ParseCloudCodePublisher;
+var Parse = require('parse/node');
 
 describe('ParseCloudCodePublisher', function() {
   beforeEach(function(done) {
     // Mock ParsePubSub
-    const mockParsePubSub = {
+    var mockParsePubSub = {
       createPublisher: jasmine.createSpy('publish').and.returnValue({
         publish: jasmine.createSpy('publish'),
         on: jasmine.createSpy('on')
@@ -19,46 +19,46 @@ describe('ParseCloudCodePublisher', function() {
   });
 
   it('can initialize', function() {
-    const config = {}
+    var config = {}
     new ParseCloudCodePublisher(config);
 
-    const ParsePubSub = require('../src/LiveQuery/ParsePubSub').ParsePubSub;
+    var ParsePubSub = require('../src/LiveQuery/ParsePubSub').ParsePubSub;
     expect(ParsePubSub.createPublisher).toHaveBeenCalledWith(config);
   });
 
   it('can handle cloud code afterSave request', function() {
-    const publisher = new ParseCloudCodePublisher({});
+    var publisher = new ParseCloudCodePublisher({});
     publisher._onCloudCodeMessage = jasmine.createSpy('onCloudCodeMessage');
-    const request = {};
+    var request = {};
     publisher.onCloudCodeAfterSave(request);
 
     expect(publisher._onCloudCodeMessage).toHaveBeenCalledWith(Parse.applicationId + 'afterSave', request);
   });
 
   it('can handle cloud code afterDelete request', function() {
-    const publisher = new ParseCloudCodePublisher({});
+    var publisher = new ParseCloudCodePublisher({});
     publisher._onCloudCodeMessage = jasmine.createSpy('onCloudCodeMessage');
-    const request = {};
+    var request = {};
     publisher.onCloudCodeAfterDelete(request);
 
     expect(publisher._onCloudCodeMessage).toHaveBeenCalledWith(Parse.applicationId + 'afterDelete', request);
   });
 
   it('can handle cloud code request', function() {
-    const publisher = new ParseCloudCodePublisher({});
-    const currentParseObject = new Parse.Object('Test');
+    var publisher = new ParseCloudCodePublisher({});
+    var currentParseObject = new Parse.Object('Test');
     currentParseObject.set('key', 'value');
-    const originalParseObject = new Parse.Object('Test');
+    var originalParseObject = new Parse.Object('Test');
     originalParseObject.set('key', 'originalValue');
-    const request = {
+    var request = {
       object: currentParseObject,
       original: originalParseObject
     };
     publisher._onCloudCodeMessage('afterSave', request);
 
-    const args = publisher.parsePublisher.publish.calls.mostRecent().args;
+    var args = publisher.parsePublisher.publish.calls.mostRecent().args;
     expect(args[0]).toBe('afterSave');
-    const message = JSON.parse(args[1]);
+    var message = JSON.parse(args[1]);
     expect(message.currentParseObject).toEqual(request.object._toFullJSON());
     expect(message.originalParseObject).toEqual(request.original._toFullJSON());
   });

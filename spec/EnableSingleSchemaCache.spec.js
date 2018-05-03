@@ -45,5 +45,5 @@ describe('Enable single schema cache', () => {
 });
 
 const fakeRequestForConfig = function() {
-  return Config.get('test');
+  return new Config('test');
 };

@@ -1,9 +1,9 @@
-const CacheController = require('../src/Controllers/CacheController.js').default;
+var CacheController = require('../src/Controllers/CacheController.js').default;
 
 describe('CacheController', function() {
-  let FakeCacheAdapter;
-  const FakeAppID = 'foo';
-  const KEY = 'hello';
+  var FakeCacheAdapter;
+  var FakeAppID = 'foo';
+  var KEY = 'hello';
 
   beforeEach(() => {
     FakeCacheAdapter = {
@@ -18,7 +18,7 @@ describe('CacheController', function() {
 
 
   it('should expose role and user caches', (done) => {
-    const cache = new CacheController(FakeCacheAdapter, FakeAppID);
+    var cache = new CacheController(FakeCacheAdapter, FakeAppID);
 
     expect(cache.role).not.toEqual(null);
     expect(cache.role.get).not.toEqual(null);
@@ -31,24 +31,24 @@ describe('CacheController', function() {
 
   ['role', 'user'].forEach((cacheName) => {
     it('should prefix ' + cacheName + ' cache', () => {
-      const cache = new CacheController(FakeCacheAdapter, FakeAppID)[cacheName];
+      var cache = new CacheController(FakeCacheAdapter, FakeAppID)[cacheName];
 
       cache.put(KEY, 'world');
-      const firstPut = FakeCacheAdapter.put.calls.first();
+      var firstPut = FakeCacheAdapter.put.calls.first();
       expect(firstPut.args[0]).toEqual([FakeAppID, cacheName, KEY].join(':'));
 
       cache.get(KEY);
-      const firstGet = FakeCacheAdapter.get.calls.first();
+      var firstGet = FakeCacheAdapter.get.calls.first();
       expect(firstGet.args[0]).toEqual([FakeAppID, cacheName, KEY].join(':'));
 
       cache.del(KEY);
-      const firstDel = FakeCacheAdapter.del.calls.first();
+      var firstDel = FakeCacheAdapter.del.calls.first();
       expect(firstDel.args[0]).toEqual([FakeAppID, cacheName, KEY].join(':'));
     });
   });
 
   it('should clear the entire cache', () => {
-    const cache = new CacheController(FakeCacheAdapter, FakeAppID);
+    var cache = new CacheController(FakeCacheAdapter, FakeAppID);
 
     cache.clear();
     expect(FakeCacheAdapter.clear.calls.count()).toEqual(1);
@@ -64,7 +64,7 @@ describe('CacheController', function() {
 
     FakeCacheAdapter.get = () => Promise.reject();
 
-    const cache = new CacheController(FakeCacheAdapter, FakeAppID);
+    var cache = new CacheController(FakeCacheAdapter, FakeAppID);
 
     cache.get('foo').then(done, () => {
       fail('Promise should not be rejected.');

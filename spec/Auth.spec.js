@@ -1,11 +1,11 @@
 describe('Auth', () => {
-  const Auth = require('../src/Auth.js').Auth;
+  var Auth = require('../src/Auth.js').Auth;
 
   describe('getUserRoles', () => {
-    let auth;
-    let config;
-    let currentRoles = null;
-    const currentUserId = 'userId';
+    var auth;
+    var config;
+    var currentRoles = null;
+    var currentUserId = 'userId';
 
     beforeEach(() => {
       currentRoles = ['role:userId'];
@@ -33,10 +33,10 @@ describe('Auth', () => {
     it('should get user roles from the cache', (done) => {
       auth.getUserRoles()
         .then((roles) => {
-          const firstSet = config.cacheController.role.set.calls.first();
+          var firstSet = config.cacheController.role.set.calls.first();
           expect(firstSet).toEqual(undefined);
 
-          const firstGet = config.cacheController.role.get.calls.first();
+          var firstGet = config.cacheController.role.get.calls.first();
           expect(firstGet.args[0]).toEqual(currentUserId);
           expect(roles).toEqual(currentRoles);
           done();
@@ -44,7 +44,7 @@ describe('Auth', () => {
     });
 
     it('should only query the roles once', (done) => {
-      const loadRolesSpy = spyOn(auth, '_loadRoles').and.callThrough();
+      var loadRolesSpy = spyOn(auth, '_loadRoles').and.callThrough();
       auth.getUserRoles()
         .then((roles) => {
           expect(roles).toEqual(currentRoles);
@@ -57,7 +57,7 @@ describe('Auth', () => {
           expect(config.cacheController.role.get.calls.count()).toEqual(1);
           expect(loadRolesSpy.calls.count()).toEqual(1);
 
-          const firstGet = config.cacheController.role.get.calls.first();
+          var firstGet = config.cacheController.role.get.calls.first();
           expect(firstGet.args[0]).toEqual(currentUserId);
           expect(roles).toEqual(currentRoles);
           done();
@@ -79,8 +79,8 @@ describe('Auth', () => {
     });
 
     it('should properly handle bcrypt upgrade', (done) => {
-      const bcryptOriginal = require('bcrypt-nodejs');
-      const bcryptNew = require('bcryptjs');
+      var bcryptOriginal = require('bcrypt-nodejs');
+      var bcryptNew = require('bcryptjs');
       bcryptOriginal.hash('my1Long:password', null, null, function(err, res) {
         bcryptNew.compare('my1Long:password', res, function(err, res) {
           expect(res).toBeTruthy();

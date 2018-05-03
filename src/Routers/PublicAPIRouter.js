@@ -13,11 +13,7 @@ export class PublicAPIRouter extends PromiseRouter {
   verifyEmail(req) {
     const { token, username } = req.query;
     const appId = req.params.appId;
-    const config = Config.get(appId);
-
-    if(!config){
-      this.invalidRequest();
-    }
+    const config = new Config(appId);
 
     if (!config.publicServerURL) {
       return this.missingPublicServerURL();
@@ -42,11 +38,7 @@ export class PublicAPIRouter extends PromiseRouter {
   resendVerificationEmail(req) {
     const username = req.body.username;
     const appId = req.params.appId;
-    const config = Config.get(appId);
-
-    if(!config){
-      this.invalidRequest();
-    }
+    const config = new Config(appId);
 
     if (!config.publicServerURL) {
       return this.missingPublicServerURL();
@@ -73,12 +65,7 @@ export class PublicAPIRouter extends PromiseRouter {
 
   changePassword(req) {
     return new Promise((resolve, reject) => {
-      const config = Config.get(req.query.id);
-
-      if(!config){
-        this.invalidRequest();
-      }
-
+      const config = new Config(req.query.id);
       if (!config.publicServerURL) {
         return resolve({
           status: 404,
@@ -101,10 +88,6 @@ export class PublicAPIRouter extends PromiseRouter {
   requestResetPassword(req) {
 
     const config = req.config;
-
-    if(!config){
-      this.invalidRequest();
-    }
 
     if (!config.publicServerURL) {
       return this.missingPublicServerURL();
@@ -131,10 +114,6 @@ export class PublicAPIRouter extends PromiseRouter {
 
     const config = req.config;
 
-    if(!config){
-      this.invalidRequest();
-    }
-
     if (!config.publicServerURL) {
       return this.missingPublicServerURL();
     }
@@ -156,7 +135,7 @@ export class PublicAPIRouter extends PromiseRouter {
         location: `${config.passwordResetSuccessURL}?${params}`
       });
     }, (err) => {
-      const params = qs.stringify({username: username, token: token, id: config.applicationId, error:err, app:config.appName});
+      const params = qs.stringify({username: username, token: token, id: config.applicationId, error:err, app:config.appName})
       return Promise.resolve({
         status: 302,
         location: `${config.choosePasswordURL}?${params}`
@@ -192,15 +171,8 @@ export class PublicAPIRouter extends PromiseRouter {
     });
   }
 
-  invalidRequest() {
-    const error = new Error();
-    error.status = 403;
-    error.message = "unauthorized";
-    throw error;
-  }
-
   setConfig(req) {
-    req.config = Config.get(req.params.appId);
+    req.config = new Config(req.params.appId);
     return Promise.resolve();
   }
 

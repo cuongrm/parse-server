@@ -1,16 +1,16 @@
-const ParsePubSub = require('../src/LiveQuery/ParsePubSub').ParsePubSub;
+var ParsePubSub = require('../src/LiveQuery/ParsePubSub').ParsePubSub;
 
 describe('ParsePubSub', function() {
 
   beforeEach(function(done) {
     // Mock RedisPubSub
-    const mockRedisPubSub = {
+    var mockRedisPubSub = {
       createPublisher: jasmine.createSpy('createPublisherRedis'),
       createSubscriber: jasmine.createSpy('createSubscriberRedis')
     };
     jasmine.mockLibrary('../src/Adapters/PubSub/RedisPubSub', 'RedisPubSub', mockRedisPubSub);
     // Mock EventEmitterPubSub
-    const mockEventEmitterPubSub = {
+    var mockEventEmitterPubSub = {
       createPublisher: jasmine.createSpy('createPublisherEventEmitter'),
       createSubscriber: jasmine.createSpy('createSubscriberEventEmitter')
     };
@@ -23,8 +23,8 @@ describe('ParsePubSub', function() {
       redisURL: 'redisURL'
     });
 
-    const RedisPubSub = require('../src/Adapters/PubSub/RedisPubSub').RedisPubSub;
-    const EventEmitterPubSub = require('../src/Adapters/PubSub/EventEmitterPubSub').EventEmitterPubSub;
+    var RedisPubSub = require('../src/Adapters/PubSub/RedisPubSub').RedisPubSub;
+    var EventEmitterPubSub = require('../src/Adapters/PubSub/EventEmitterPubSub').EventEmitterPubSub;
     expect(RedisPubSub.createPublisher).toHaveBeenCalledWith({redisURL: 'redisURL'});
     expect(EventEmitterPubSub.createPublisher).not.toHaveBeenCalled();
   });
@@ -32,8 +32,8 @@ describe('ParsePubSub', function() {
   it('can create event emitter publisher', function() {
     ParsePubSub.createPublisher({});
 
-    const RedisPubSub = require('../src/Adapters/PubSub/RedisPubSub').RedisPubSub;
-    const EventEmitterPubSub = require('../src/Adapters/PubSub/EventEmitterPubSub').EventEmitterPubSub;
+    var RedisPubSub = require('../src/Adapters/PubSub/RedisPubSub').RedisPubSub;
+    var EventEmitterPubSub = require('../src/Adapters/PubSub/EventEmitterPubSub').EventEmitterPubSub;
     expect(RedisPubSub.createPublisher).not.toHaveBeenCalled();
     expect(EventEmitterPubSub.createPublisher).toHaveBeenCalled();
   });
@@ -43,8 +43,8 @@ describe('ParsePubSub', function() {
       redisURL: 'redisURL'
     });
 
-    const RedisPubSub = require('../src/Adapters/PubSub/RedisPubSub').RedisPubSub;
-    const EventEmitterPubSub = require('../src/Adapters/PubSub/EventEmitterPubSub').EventEmitterPubSub;
+    var RedisPubSub = require('../src/Adapters/PubSub/RedisPubSub').RedisPubSub;
+    var EventEmitterPubSub = require('../src/Adapters/PubSub/EventEmitterPubSub').EventEmitterPubSub;
     expect(RedisPubSub.createSubscriber).toHaveBeenCalledWith({redisURL: 'redisURL'});
     expect(EventEmitterPubSub.createSubscriber).not.toHaveBeenCalled();
   });
@@ -52,8 +52,8 @@ describe('ParsePubSub', function() {
   it('can create event emitter subscriber', function() {
     ParsePubSub.createSubscriber({});
 
-    const RedisPubSub = require('../src/Adapters/PubSub/RedisPubSub').RedisPubSub;
-    const EventEmitterPubSub = require('../src/Adapters/PubSub/EventEmitterPubSub').EventEmitterPubSub;
+    var RedisPubSub = require('../src/Adapters/PubSub/RedisPubSub').RedisPubSub;
+    var EventEmitterPubSub = require('../src/Adapters/PubSub/EventEmitterPubSub').EventEmitterPubSub;
     expect(RedisPubSub.createSubscriber).not.toHaveBeenCalled();
     expect(EventEmitterPubSub.createSubscriber).toHaveBeenCalled();
   });
@@ -73,8 +73,8 @@ describe('ParsePubSub', function() {
     });
     expect(adapter.createSubscriber).toHaveBeenCalled();
 
-    const RedisPubSub = require('../src/Adapters/PubSub/RedisPubSub').RedisPubSub;
-    const EventEmitterPubSub = require('../src/Adapters/PubSub/EventEmitterPubSub').EventEmitterPubSub;
+    var RedisPubSub = require('../src/Adapters/PubSub/RedisPubSub').RedisPubSub;
+    var EventEmitterPubSub = require('../src/Adapters/PubSub/EventEmitterPubSub').EventEmitterPubSub;
     expect(RedisPubSub.createSubscriber).not.toHaveBeenCalled();
     expect(EventEmitterPubSub.createSubscriber).not.toHaveBeenCalled();
     expect(RedisPubSub.createPublisher).not.toHaveBeenCalled();
@@ -100,8 +100,8 @@ describe('ParsePubSub', function() {
     });
     expect(adapter.createSubscriber).toHaveBeenCalled();
 
-    const RedisPubSub = require('../src/Adapters/PubSub/RedisPubSub').RedisPubSub;
-    const EventEmitterPubSub = require('../src/Adapters/PubSub/EventEmitterPubSub').EventEmitterPubSub;
+    var RedisPubSub = require('../src/Adapters/PubSub/RedisPubSub').RedisPubSub;
+    var EventEmitterPubSub = require('../src/Adapters/PubSub/EventEmitterPubSub').EventEmitterPubSub;
     expect(RedisPubSub.createSubscriber).not.toHaveBeenCalled();
     expect(EventEmitterPubSub.createSubscriber).not.toHaveBeenCalled();
     expect(RedisPubSub.createPublisher).not.toHaveBeenCalled();

@@ -30,7 +30,7 @@ export class AdaptableController {
   }
 
   get config() {
-    return Config.get(this.appId);
+    return new Config(this.appId);
   }
 
   expectedAdapterType() {

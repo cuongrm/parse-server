@@ -1,11 +1,11 @@
-const ParseWebSocketServer = require('../src/LiveQuery/ParseWebSocketServer').ParseWebSocketServer;
+var ParseWebSocketServer = require('../src/LiveQuery/ParseWebSocketServer').ParseWebSocketServer;
 
 describe('ParseWebSocketServer', function() {
 
   beforeEach(function(done) {
     // Mock ws server
-    const EventEmitter = require('events');
-    const mockServer = function() {
+    var EventEmitter = require('events');
+    var mockServer = function() {
       return new EventEmitter();
     };
     jasmine.mockLibrary('ws', 'Server', mockServer);
@@ -13,11 +13,11 @@ describe('ParseWebSocketServer', function() {
   });
 
   it('can handle connect event when ws is open', function(done) {
-    const onConnectCallback = jasmine.createSpy('onConnectCallback');
-    const http = require('http');
-    const server = http.createServer();
-    const parseWebSocketServer = new ParseWebSocketServer(server, onConnectCallback, 5).server;
-    const ws = {
+    var onConnectCallback = jasmine.createSpy('onConnectCallback');
+    var http = require('http');
+    var server = http.createServer();
+    var parseWebSocketServer = new ParseWebSocketServer(server, onConnectCallback, 5).server;
+    var ws = {
       readyState: 0,
       OPEN: 0,
       ping: jasmine.createSpy('ping')
